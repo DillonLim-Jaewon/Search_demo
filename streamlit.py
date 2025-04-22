@@ -1,16 +1,26 @@
 # streamlit.py
 import streamlit as st
 import pandas as pd
+from PIL import Image
 from search.keyword_search import keyword_search
 from search.vector_search import vector_search
 from search.hybrid_search import hybrid_search
 
-st.title("🔍 뉴스 통합 검색 데모")
 
-# 검색어 입력
-search_word = st.text_input("검색어를 입력하세요", value="네이버")
+logo_image = Image.open("assets/logo.png")
+st.set_page_config(
+    page_title = "lloydk", 
+    page_icon=logo_image,
+    layout="centered"
+)
 
-# 날짜 필터
+st.image(logo_image, width=200, caption='LLOYDK Search Demo')
+
+
+# Search area
+search_word = st.text_input("검색어를 입력하세요")
+
+# Data filter
 col1, col2 = st.columns(2)
 with col1:
     start_date = st.date_input("시작 날짜", pd.to_datetime("2023-01-01"))
@@ -30,21 +40,3 @@ if st.button("검색"):
     # 결과 표시
     st.subheader("📄 검색 결과")
     col1, col2, col3 = st.columns(3)
-
-    with col1:
-        st.markdown(f"### 🔤 텍스트 검색
-⏱ {text_took}ms")
-        for doc in text_hits:
-            st.markdown(f"- {doc['_source']['title_with_content'][:100]}...")
-
-    with col2:
-        st.markdown(f"### 📐 벡터 검색
-⏱ {vector_took}ms")
-        for doc in vector_hits:
-            st.markdown(f"- {doc['_source']['title_with_content'][:100]}...")
-
-    with col3:
-        st.markdown(f"### 🤝 하이브리드 검색
-⏱ {hybrid_took}ms")
-        for doc in hybrid_hits:
-            st.markdown(f"- {doc['_source']['title_with_content'][:100]}...")
