@@ -1,5 +1,6 @@
 certs/http_ca.crt
 search/config.py
+.env
 
 
 # __pycache__
@@ -178,5 +179,3 @@ poetry.toml
 
 # LSP config files
 pyrightconfig.json
-
-# End of https://www.toptal.com/developers/gitignore/api/python
