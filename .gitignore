@@ -1,6 +1,6 @@
 certs/http_ca.crt
-search/config.py
-.env
+config/config.py
+config/.env
 
 
 # __pycache__
