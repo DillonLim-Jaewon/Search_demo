@@ -1,6 +1,10 @@
+# Info
 utils folder is used for embedding vectors and converting bulk format in Google Colab. This folder is not used in Streamlit project. 
 
 
+# Data Flow Overview
+
+```plaintext
 [ Company Elasticsearch ]
         |
         |  Scroll API → JSONL (naver_news.jsonl)
@@ -22,7 +26,7 @@ utils folder is used for embedding vectors and converting bulk format in Google 
         v
 [ Streamlit Web App ]
 
-
+# Bulk_format
 Bulk format is important because
 1. Efficiently insert large volumes of data into Elasticsearch
 2. Allows batch processing
