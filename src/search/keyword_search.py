@@ -1,4 +1,4 @@
-from search.config import es
+from config.config import es
 
 def keyword_search(search_word, start_date, end_date):
     params = {

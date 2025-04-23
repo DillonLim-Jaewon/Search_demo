@@ -1,5 +1,5 @@
 import torch
-from config import tokenizer, model, device
+from config.config import tokenizer, model, device
 from torch.nn import functional as F
 
 def embed_query(text: str, normalize: bool = False) -> list:

@@ -1,4 +1,4 @@
-from search.config import es
+from config.config import es
 
 
 def enroll_keyword_template():

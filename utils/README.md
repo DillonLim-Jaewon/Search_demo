@@ -25,6 +25,7 @@ utils folder is used for embedding vectors and converting bulk format in Google 
         |
         v
 [ Streamlit Web App ]
+```
 
 # Bulk_format
 Bulk format is important because
