@@ -1,6 +1,7 @@
-from sentence_transformers import SentenceTransformer
-import torch
 import json
+
+import torch
+from sentence_transformers import SentenceTransformer
 from tqdm import tqdm
 
 model = SentenceTransformer("intfloat/multilingual-e5-base")
@@ -21,9 +22,11 @@ with open(input_path, "r", encoding="utf-8") as infile, open(output_path, "w", e
         doc = json.loads(line)
         text = doc.get("title_with_content")
 
+        # Adds the current document and its text into a batch if text exists.
         if text:
             batch.append((doc, text))
 
+        # Once the batch reaches the batch_size, embedding and writing are triggered.
         if len(batch) == batch_size:
             texts = [t for _, t in batch]
             vectors = model.encode(texts, convert_to_tensor=True, device=device).cpu().tolist()
@@ -33,10 +36,11 @@ with open(input_path, "r", encoding="utf-8") as infile, open(output_path, "w", e
                 outfile.write(json.dumps(doc, ensure_ascii=False) + "\n")
 
             total_processed += len(batch)
-            tqdm.write(f"✅ Total processed: {total_processed}")
+            tqdm.write(f"Total processed: {total_processed}")
             batch = []
 
-    # 남은 배치 처리
+    # Handling remaining documents(Final batch)
+    # After the main loop, if there are any leftover documents in the batch(less than 1024)
     if batch:
         texts = [t for _, t in batch]
         vectors = model.encode(texts, convert_to_tensor=True, device=device).cpu().tolist()
@@ -46,6 +50,6 @@ with open(input_path, "r", encoding="utf-8") as infile, open(output_path, "w", e
             outfile.write(json.dumps(doc, ensure_ascii=False) + "\n")
 
         total_processed += len(batch)
-        tqdm.write(f"✅ Final batch done. Total processed: {total_processed}")
+        tqdm.write(f"Final batch done. Total processed: {total_processed}")
 
-print(f"🎉 All saved: {output_path}")
+print(f" Embedding completed. Output saved to : {output_path}")
