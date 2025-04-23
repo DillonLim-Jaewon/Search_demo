@@ -47,7 +47,7 @@ def scroll_export(
             cleaned = clean_doc(doc, remove_fields)
             f.write(json.dumps(cleaned, ensure_ascii=False) + "\n")
         total += len(hits)
-        print(f"▶ Initial retrieved: {total}")
+        print(f"Initial retrieved: {total}")
 
         while True:
             scroll_res = requests.post(

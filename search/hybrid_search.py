@@ -1,27 +1,21 @@
-from search.config import es, model, tokenizer, device
+# hybrid_search.py
+from config import es, tokenizer, model, device
 import torch
 from torch.nn import functional as F
+from search.query_embedding import embed_query
 
 
-def encode_text(text: str) -> list:
-    with torch.no_grad():
-        encoded = tokenizer(text, return_tensors="pt", truncation=True, max_length=512, padding=True).to(device)
-        output = model(**encoded)
-        embedding = output.last_hidden_state.mean(dim=1)
-        # embedding = F.normalize(embedding, p=2, dim=1)
-        return embedding.squeeze().tolist()
-
-
-def hybrid_search(query: str, start_date: str = "2023-01-01", end_date: str = "2023-12-31", k: int = 3) -> dict:
-    query_vector = encode_text(query)
+def hybrid_search(search_word: str, start_date: str = '2023-01-01', end_date: str = '2023-12-31') -> tuple:
+    """
+    Hybrid search: Keyword search + Vector search + RRF ranking.
+    """
+    query_vector = embed_query(search_word, normalize=True)
     res = es.search(
-        index="naver_news_*",
-        size=k,
+        index='naver_news_*',
+        size=3,
         query={
             "bool": {
-                "must": [
-                    {"match": {"title_with_content": query}}
-                ],
+                "must": [{"match": {"title_with_content": search_word}}],
                 "filter": [
                     {"range": {"date": {"gte": start_date, "lte": end_date}}}
                 ]
@@ -29,11 +23,11 @@ def hybrid_search(query: str, start_date: str = "2023-01-01", end_date: str = "2
         },
         knn={
             "field": "title_with_content_vector",
-            "k": k,
-            "num_candidates": 100,
+            "k": 3,
+            "num_candidates": 20,
             "query_vector": query_vector
         },
-        rank={"rrf": {}},
+        rank={'rrf': {}},
         source_includes=["title_with_content"]
     )
-    return res
+    return res['hits']['hits'], res['took']

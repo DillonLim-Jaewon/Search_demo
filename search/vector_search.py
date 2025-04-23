@@ -1,27 +1,23 @@
-from search.config import es, model, tokenizer, device
+# vector_search.py
+from config import es, tokenizer, model, device
 import torch
+from torch.nn import functional as F
+from search.query_embedding import embed_query
 
 
-def encode_text(text: str) -> list:
-    with torch.no_grad():
-        encoded = tokenizer(text, return_tensors="pt", truncation=True, max_length=512, padding=True).to(device)
-        output = model(**encoded)
-        embedding = output.last_hidden_state.mean(dim=1)
-        # embedding = F.normalize(embedding, p=2, dim=1)  # Optional normalization
-        return embedding.squeeze().tolist()
-
-
-def vector_search(query: str, k: int = 3) -> dict:
-    query_vector = encode_text(query)
+# Vector search using KNN query on the embedded Elasticsearch index.
+def vector_search(input_query: str) -> tuple:
+    # normalize -> cosine similarity 기준
+    query_vector = embed_query(input_query, normalize=True) 
     res = es.search(
-        index="naver_news_*",
-        size=k,
+        index='naver_news_*',
+        size=3,
         knn={
             "field": "title_with_content_vector",
-            "k": k,
+            "k": 3,
             "num_candidates": 100,
             "query_vector": query_vector
         },
-        source_includes=["title_with_content"]
+        source_includes=['title_with_content']
     )
-    return res
+    return res['hits']['hits'], res['took']
