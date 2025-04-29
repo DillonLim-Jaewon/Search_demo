@@ -2,7 +2,7 @@
 from config.config import es, tokenizer, model, device
 import torch
 from torch.nn import functional as F
-from search.query_embedding import embed_query
+from query_embedding import embed_query
 
 
 # Vector search using KNN query on the embedded Elasticsearch index.
